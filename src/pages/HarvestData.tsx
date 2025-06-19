@@ -1,14 +1,20 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navigation from '../components/Navigation';
+import Login from '../components/Login';
+import Map from '../components/Map';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { Database, Plus, Search, Download, MapPin } from 'lucide-react';
+import { Database, Plus, Search, Download, MapPin, LogOut } from 'lucide-react';
+import { Button } from '../components/ui/button';
 
 const HarvestData = () => {
-  // Sample data for demonstration
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+
+  // Sample data for demonstration - removed "manta2a" references
   const harvestData = [
     {
-      zone: "manta2a-north",
+      zone: "north",
       landNumber: "001",
       landSize: 2500,
       treeCount: 45,
@@ -17,7 +23,7 @@ const HarvestData = () => {
       harvestTime: "08:00 - 14:30"
     },
     {
-      zone: "manta2a-south",
+      zone: "south",
       landNumber: "002", 
       landSize: 3200,
       treeCount: 62,
@@ -26,7 +32,7 @@ const HarvestData = () => {
       harvestTime: "07:30 - 15:00"
     },
     {
-      zone: "manta2a-east",
+      zone: "east",
       landNumber: "003",
       landSize: 1800,
       treeCount: 33,
@@ -35,6 +41,20 @@ const HarvestData = () => {
       harvestTime: "09:00 - 13:45"
     }
   ];
+
+  const handleLogin = (success: boolean) => {
+    setIsAuthenticated(success);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowMap(false);
+  };
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
@@ -51,6 +71,16 @@ const HarvestData = () => {
             <p className="text-xl text-green-100 max-w-3xl mx-auto">
               Real-time data from our drone-assisted pine harvesting operations across all zones
             </p>
+            <div className="mt-6">
+              <Button 
+                onClick={handleLogout}
+                variant="outline"
+                className="bg-transparent border-white text-white hover:bg-white hover:text-green-800"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -64,9 +94,12 @@ const HarvestData = () => {
                 <Plus className="h-4 w-4" />
                 Add New Entry
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={() => setShowMap(!showMap)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
                 <MapPin className="h-4 w-4" />
-                View Map
+                {showMap ? 'Hide Map' : 'View Map'}
               </button>
             </div>
             
@@ -87,6 +120,13 @@ const HarvestData = () => {
           </div>
         </div>
 
+        {/* Map Section */}
+        {showMap && (
+          <div className="mb-8">
+            <Map />
+          </div>
+        )}
+
         {/* Data Table */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="p-6 border-b border-gray-200">
@@ -98,7 +138,7 @@ const HarvestData = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Zone (manta2a)</TableHead>
+                  <TableHead>Zone</TableHead>
                   <TableHead>Land #</TableHead>
                   <TableHead>Land (m²)</TableHead>
                   <TableHead># of Trees</TableHead>
